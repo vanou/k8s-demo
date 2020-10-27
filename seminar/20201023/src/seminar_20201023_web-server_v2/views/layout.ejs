@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8'>
+  <title>Welcome to <%= ejsHostname%></title>
+</head>
+<body>
+  <div id='pod-information'>
+    <p><b>Application Version:</b>  v<%= ejsVersion %></p>
+    <p><b>Hostname of Pod:</b>  <%= ejsHostname %></p>
+    <p><b>IP Adress of Pod:</b>
+      <% if (ejsAddressList.length !== 0) { %>
+        <ul>
+          <% for (let i in ejsAddressList) { %>
+            <li><b>[<%= i %>]:</b>
+              <ul>
+              <% for (let j of ejsAddressList[i]) { %>
+                <li><%= j %></li>
+              <% } %>
+              </ul>
+            </li>
+          <% } %>
+        </ul>
+      <% } %>
+    </p>
+  </div>
+  <div id='form'>
+    <form action='/' method='post'>
+      <label for='item-name'>Item Name:</label>
+      <input type='text' id='item-name' name='itemName'>
+      <button type='submit' autofocus='true'>Add</button>
+      <button type='submit' formaction='/delete-item'>Delete</button>
+    </form>
+  </div>
+  <%- body %>
+</body>
+</html>

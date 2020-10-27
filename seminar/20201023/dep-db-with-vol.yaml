@@ -1,0 +1,54 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: db-server
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: db
+  template:
+    metadata:
+      labels:
+        role: db
+    spec:
+      containers:
+        - name: mongodb
+          image: mongo:4
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: mongo-init
+              mountPath: /docker-entrypoint-initdb.d
+            - name: data-vol
+              mountPath: /data/db
+      volumes:
+        - name: mongo-init
+          configMap:
+            name: mongo-init-script
+        - name: data-vol
+          persistentVolumeClaim:
+            claimName: pvc-db
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: mongo-init-script
+  namespace: default
+data:
+  init.js: |
+    const conn = new Mongo(),
+      demoDB = conn.getDB('demo');
+
+    demoDB.createUser(
+      { user: 'web-app',
+        pwd: '20201023',
+        roles: [ 'readWrite' ]
+      }
+    );
+    demoDB.createCollection('lists');
+    let listsColl = demoDB.getCollection('lists');
+    listsColl.insertOne( { '_id': 0, items: [] } );

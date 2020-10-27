@@ -1,0 +1,39 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: web-server
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      role: web
+  template:
+    metadata:
+      labels:
+        role: web
+    spec:
+      containers:
+        - name: web-server-container
+          image: vanou/k8s-demo_seminar-20201023_web-server:v1
+          ports:
+            - containerPort: 80
+          envFrom:
+            - configMapRef:
+                # You should use another means (e.g. Secret) to store sensitive data
+                name: web-server-env
+
+---
+
+# You should use another means (e.g. Secret) to store sensitive data
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: web-server-env
+  namespace: default
+data:
+  DB_COLL: lists
+  DB_NAME: demo
+  DB_PASS: "20201023"
+  DB_URL: svc-db.default.svc
+  DB_USER: web-app
